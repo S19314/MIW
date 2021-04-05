@@ -3,6 +3,7 @@ import numpy as np
 
 class MarkovChain(object):
     gamestates = 0
+    humanGameState = 0
     columnNames = [["Kamień", "Papier", "Nożyce"], ["Kamień", "Papier", "Nożyce"]]
     TransitionMatrix = [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
     NumberStepsMatrix = [3, 3, 3]
@@ -24,6 +25,9 @@ class MarkovChain(object):
 
     def printGameStates(self):
         print("GameStates: " + str(self.gamestates))
+
+    def printHumanGameState(self):
+        print("HumanGameStates: " + str(self.humanGameState))
 
     def printTransitionProbabilityMatrix(self):
         print("TransitionProbabilityMatrix")
@@ -51,54 +55,63 @@ class MarkovChain(object):
         if (pythonStep == humanStep):
             print("pythonStep == humanStep")
             self.gamestates += 0
+            self.humanGameState += 0
             for i in range(len(self.columnNames[0])) :
                 if(pythonStep == self.columnNames[0][i]) :
-                    self.TransitionMatrix[i][i] = self.TransitionMatrix[i][i] + 1
-                    self.NumberStepsMatrix[i] = self.NumberStepsMatrix[i] + 1
+                    dominationStep = self.getDominationStep(pythonStep)
+                    for j in range(len(self.columnNames[i])) :
+                        if dominationStep == self.columnNames[i][j] :
+                            self.TransitionMatrix[i][j] += 1
+                            self.NumberStepsMatrix[i] += 1
                     print("Remis in WhoWin")
                     return "Remis"
         else:
             if (humanStep == "Kamień"):
-            # if (pythonStep == "Kamień"):
                 if (pythonStep == "Nożyce"):
+                    """
                     self.TransitionMatrix[0][2] = self.TransitionMatrix[0][2] + 1
                     self.NumberStepsMatrix[0] = self.NumberStepsMatrix[0] + 1
+                    """
                     self.gamestates -= 1
+                    self.humanGameState += 1
                     return "Win: Human!"
-                    # return "Win: Python Programm"
                 elif (pythonStep == "Papier"):
                     self.TransitionMatrix[0][1] = self.TransitionMatrix[0][1] + 1
                     self.NumberStepsMatrix[0] = self.NumberStepsMatrix[0] + 1
                     self.gamestates += 1
+                    self.humanGameState -= 1
                     return "Win: Python Programm"
-                    # return "Win: Human!"
             if (humanStep == "Nożyce"):
                 if (pythonStep == "Papier"):
+                    '''
                     self.TransitionMatrix[2][1] = self.TransitionMatrix[2][1] + 1
                     self.NumberStepsMatrix[2] = self.NumberStepsMatrix[2] + 1
+                    '''
                     self.gamestates -= 1
+                    self.humanGameState += 1
                     return "Win: Human!"
-                    # return "Win: Python Programm"
                 elif (pythonStep == "Kamień"):
                     self.TransitionMatrix[2][0] = self.TransitionMatrix[2][0] + 1
                     self.NumberStepsMatrix[2] = self.NumberStepsMatrix[2] + 1
                     self.gamestates += 1
+                    self.humanGameState -= 1
                     return "Win: Python Programm"
-                    # return "Win: Human!"
             if (humanStep == "Papier"):
                 if (pythonStep == "Kamień"):
+                    '''
                     self.TransitionMatrix[1][0] = self.TransitionMatrix[1][0] + 1
                     self.NumberStepsMatrix[1] = self.NumberStepsMatrix[1] + 1
+                    '''
                     self.gamestates -= 1
+                    self.humanGameState += 1
                     return "Win: Human!"
-                    # return "Win: Python Programm"
                 elif (pythonStep == "Nożyce"):
                     self.TransitionMatrix[1][2] = self.TransitionMatrix[1][2] + 1
                     self.NumberStepsMatrix[1] = self.NumberStepsMatrix[1] + 1
-                    #self.gamestates -= 1
                     self.gamestates += 1
+                    self.humanGameState -= 1
                     return "Win: Python Programm"
-                    # return "Win: Human!"
+
 
     def getNextStep(self, columnId):
         randomFloat = np.random.uniform(0, 1)
@@ -130,23 +143,18 @@ class MarkovChain(object):
 
     def doStep(self, pythonStep):# humanStep):
         state = ""
-        if(humanStep.startswith("K")) : # == "K") :
+        if(pythonStep.startswith("K")) :
             state = self.columnNames[0][self.getNextStep(0)]
-            # self.TransitionProbabilityMatrix[0][TransitionProbabilityMatrix <= randomFloat]
-             # g[any(g==4, g==32)] # something like that
-            # state = np.random.choice(self.columnNames, self.TransitionProbabilityMatrix[0])
-        elif(humanStep.startswith("P")) : # == "P") :
+        elif(pythonStep.startswith("P")) :
             state = self.columnNames[0][self.getNextStep(1)]
-            # state = self.columnNames[self.getNextStep(self, 1)]
-            # state = np.random.choice(self.columnNames, self.TransitionProbabilityMatrix[1])
-        elif (humanStep.startswith("N")) : # == "N"):
+        elif (pythonStep.startswith("N")) :
             state = self.columnNames[0][self.getNextStep(2)]
-            # state = self.columnNames[self.getNextStep(self, 2)]
-            # state = np.random.choice(self.columnNames, self.TransitionProbabilityMatrix[2])
 
+        '''
         print("State before getDomination " + state)
         return  self.getDominationStep(state)
-        # return state
+        '''
+        return state
 
 
 markovChain = MarkovChain()
@@ -166,6 +174,7 @@ while(command != "END"):
     pythonStep = markovChain.previousStep # markovChain.doStep(humanStep)
     print(markovChain.whoWin(pythonStep, humanStep))
     markovChain.printGameStates()
+    markovChain.printHumanGameState()
     markovChain.printTransitionProbabilityMatrix()
     markovChain.printTransitionMatrix()
     command = input()

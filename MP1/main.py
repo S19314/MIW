@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class MarkovChain(object):
     gamestates = 0
     humanGameState = 0
@@ -48,69 +47,74 @@ class MarkovChain(object):
             print("     ", end='')
             print(self.TransitionMatrix[i])
 
+    def actualizationValueInTransitionMatrix(self, humanStep):
+        if (self.previousStep == humanStep):
+            for i in range(len(self.columnNames[0])):
+                if (self.previousStep == self.columnNames[0][i]):
+                    for j in range(len(self.columnNames[i])):
+                        if humanStep == self.columnNames[i][j]:
+                            self.TransitionMatrix[i][j] += 1
+                            self.NumberStepsMatrix[i] += 1
+        else:
+            if (self.previousStep == "Kamień"):
+                if (humanStep == "Nożyce"):
+                    self.TransitionMatrix[0][2] = self.TransitionMatrix[0][2] + 1
+                    self.NumberStepsMatrix[0] = self.NumberStepsMatrix[0] + 1
+                elif (humanStep == "Papier"):
+                    self.TransitionMatrix[0][1] = self.TransitionMatrix[0][1] + 1
+                    self.NumberStepsMatrix[0] = self.NumberStepsMatrix[0] + 1
+            if (self.previousStep == "Nożyce"):
+                if (humanStep == "Papier"):
+                    self.TransitionMatrix[2][1] = self.TransitionMatrix[2][1] + 1
+                    self.NumberStepsMatrix[2] = self.NumberStepsMatrix[2] + 1
+                elif (humanStep == "Kamień"):
+                    self.TransitionMatrix[2][0] = self.TransitionMatrix[2][0] + 1
+                    self.NumberStepsMatrix[2] = self.NumberStepsMatrix[2] + 1
+            if (self.previousStep == "Papier"):
+                if (humanStep == "Kamień"):
+                    self.TransitionMatrix[1][0] = self.TransitionMatrix[1][0] + 1
+                    self.NumberStepsMatrix[1] = self.NumberStepsMatrix[1] + 1
+                elif (humanStep == "Nożyce"):
+                    self.TransitionMatrix[1][2] = self.TransitionMatrix[1][2] + 1
+                    self.NumberStepsMatrix[1] = self.NumberStepsMatrix[1] + 1
+
     def whoWin(self, pythonStep, humanStep):  # whoWin - необходимо переделать/доделать
         print("In WhoWin()")
         print("pythonStep: " + pythonStep)
         print("humanStep: " + humanStep)
         if (pythonStep == humanStep):
-            print("pythonStep == humanStep")
             self.gamestates += 0
             self.humanGameState += 0
-            for i in range(len(self.columnNames[0])) :
-                if(self.previousStep == self.columnNames[0][i]) :
-                    for j in range(len(self.columnNames[i])) :
-                        if humanStep == self.columnNames[i][j] :
-                            self.TransitionMatrix[i][j] += 1
-                            self.NumberStepsMatrix[i] += 1
-                    print("Remis in WhoWin")
-                    return "Remis"
+            print("Remis in WhoWin")
+            return "Remis"
         else:
-            if (self.previousStep == "Kamień"):
-                if (humanStep == "Nożyce"):
-
-                    self.TransitionMatrix[0][2] = self.TransitionMatrix[0][2] + 1
-                    self.NumberStepsMatrix[0] = self.NumberStepsMatrix[0] + 1
-
+            if (humanStep == "Kamień"):
+                if (pythonStep == "Nożyce"):
                     self.gamestates -= 1
                     self.humanGameState += 1
                     return "Win: Human!"
-                elif (humanStep == "Papier"):
-                    self.TransitionMatrix[0][1] = self.TransitionMatrix[0][1] + 1
-                    self.NumberStepsMatrix[0] = self.NumberStepsMatrix[0] + 1
+                elif (pythonStep == "Papier"):
                     self.gamestates += 1
                     self.humanGameState -= 1
                     return "Win: Python Programm"
-            if (self.previousStep == "Nożyce"):
-                if (humanStep == "Papier"):
-
-                    self.TransitionMatrix[2][1] = self.TransitionMatrix[2][1] + 1
-                    self.NumberStepsMatrix[2] = self.NumberStepsMatrix[2] + 1
-
+            if (humanStep == "Nożyce"):
+                if (pythonStep == "Papier"):
                     self.gamestates -= 1
                     self.humanGameState += 1
                     return "Win: Human!"
-                elif (humanStep == "Kamień"):
-                    self.TransitionMatrix[2][0] = self.TransitionMatrix[2][0] + 1
-                    self.NumberStepsMatrix[2] = self.NumberStepsMatrix[2] + 1
+                elif (pythonStep == "Kamień"):
                     self.gamestates += 1
                     self.humanGameState -= 1
                     return "Win: Python Programm"
-            if (self.previousStep == "Papier"):
-                if (humanStep == "Kamień"):
-
-                    self.TransitionMatrix[1][0] = self.TransitionMatrix[1][0] + 1
-                    self.NumberStepsMatrix[1] = self.NumberStepsMatrix[1] + 1
-
+            if (humanStep == "Papier"):
+                if (pythonStep == "Kamień"):
                     self.gamestates -= 1
                     self.humanGameState += 1
                     return "Win: Human!"
-                elif (humanStep == "Nożyce"):
-                    self.TransitionMatrix[1][2] = self.TransitionMatrix[1][2] + 1
-                    self.NumberStepsMatrix[1] = self.NumberStepsMatrix[1] + 1
+                elif (pythonStep == "Nożyce"):
                     self.gamestates += 1
                     self.humanGameState -= 1
                     return "Win: Python Programm"
-
 
     def getNextStep(self, columnId):
         randomFloat = np.random.uniform(0, 1)
@@ -173,6 +177,7 @@ while(command != "END"):
     pythonStep = markovChain.doStep()
     # pythonStep = markovChain.previousStep # markovChain.doStep(humanStep)
     print(markovChain.whoWin(pythonStep, humanStep))
+    markovChain.actualizationValueInTransitionMatrix(humanStep)
     markovChain.printGameStates()
     markovChain.printHumanGameState()
     markovChain.printTransitionProbabilityMatrix()

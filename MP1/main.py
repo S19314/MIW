@@ -79,13 +79,9 @@ class MarkovChain(object):
                     self.NumberStepsMatrix[1] = self.NumberStepsMatrix[1] + 1
 
     def whoWin(self, pythonStep, humanStep):  # whoWin - необходимо переделать/доделать
-        print("In WhoWin()")
-        print("pythonStep: " + pythonStep)
-        print("humanStep: " + humanStep)
         if (pythonStep == humanStep):
             self.gamestates += 0
             self.humanGameState += 0
-            print("Remis in WhoWin")
             return "Remis"
         else:
             if (humanStep == "Kamień"):
@@ -118,7 +114,7 @@ class MarkovChain(object):
 
     def getNextStep(self, columnId):
         randomFloat = np.random.uniform(0, 1)
-        print("randomFloat: " + str(randomFloat))
+        # print("randomFloat: " + str(randomFloat))
         indexResult = -1
         previousPropability = 0
         currentPropability = 0
@@ -126,13 +122,11 @@ class MarkovChain(object):
         for i in range(len(transitionProbabilityMatrix[columnId])) :
             iterationPropability = transitionProbabilityMatrix[columnId][i]
             currentPropability += iterationPropability
-            print("currentPropability: " + str(currentPropability))
-            print("previousPropability: " + str(previousPropability))
+            # print("currentPropability: " + str(currentPropability))
+            # print("previousPropability: " + str(previousPropability))
             if(previousPropability <= randomFloat and randomFloat <= currentPropability ) :
                     indexResult = i
             previousPropability = currentPropability
-
-        print("IndexResult: " + str(indexResult))
         return  indexResult
 
     def getDominationStep(self, step):
@@ -152,17 +146,10 @@ class MarkovChain(object):
             state = self.columnNames[0][self.getNextStep(1)]
         elif (self.previousStep.startswith("N")) :
             state = self.columnNames[0][self.getNextStep(2)]
-
-
-        print("State before getDomination " + state)
         return  self.getDominationStep(state)
-
-        # return state
 
 
 markovChain = MarkovChain()
-
-print("Is It rock? " + markovChain.columnNames[0][0])
 
 print('Initialization')
 markovChain.printTransitionProbabilityMatrix()
@@ -184,9 +171,7 @@ while(command != "END"):
     markovChain.printTransitionMatrix()
     markovChain.previousStep = humanStep
     command = input()
-    # print("Before doStep " + markovChain.previousStep)
-    # markovChain.previousStep = markovChain.doStep(pythonStep)
-    # print("After doStep " + markovChain.previousStep)
+
     '''
     # Just for fun
     # I decided to share it with you.

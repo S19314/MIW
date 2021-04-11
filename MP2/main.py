@@ -25,20 +25,28 @@ class Perceptron(object):
         return np.dot(X, self.w_[1:]) + self.w_[0]
 
     def predict(self, X):
-        return np.where(self.net_input(X) >= 0.0, 1, -1)
+        result = np.where(self.net_input(X) >= 0.0, 1, -1)
+        if(len(X) > 2) :
+            print("X")
+            print(X)
+            print("Perceptron predict result ")
+            print(result)
+        # return np.where(self.net_input(X) >= 0.0, 1, -1)
+        return  result
 
-class Classifier:
+class Classifier(object):
+    ppnArray = []
     def __init__(self, ppnArray):
-        self.ppnArray = ppnArray
+        self.ppnArray = ppnArray.copy()
 
     def predict(self, x):
         quantityPerceptrons = len(self.ppnArray)
         for i in range(quantityPerceptrons):
-          prediction = np.where(self.ppnArray[i].predict(x) == 1, i, i+1) # Is it a good idea to use i + 1?
-          if self.ppnArray[i].predict(x) == 1 :
+          ppn = self.ppnArray[i]
+          if (ppn.predict(x) == 1 ):
             return i
 
-        return quantityPerceptrons
+        return quantityPerceptrons # Optional...
 
 '''
 class DataSetManager(object):
@@ -121,9 +129,20 @@ def main():
     print(target_train_01_subset)
     ppn = Perceptron(eta=0.2, n_iter=200)
     ppn.fit(data_train_01_subset, target_train_01_subset)
+
+    classificator = Classifier(perceptrons)
+
+    plot_decision_regions(X=perceptronManager.getData_train_01_subset(),
+                          y=perceptronManager.getTarget_train_01_subset(), classifier=classificator)
+    plt.xlabel(r'$x_1$')
+    plt.ylabel(r'$x_2$')
+    plt.legend(loc='upper left')
+    plt.show()
+
+    '''
     for perc in perceptrons:
         showResultsTask1(perceptronManager, perc)
-
+    '''
     '''
     data_train, data_test, target_train, target_test = train_test_split(iris_data, iris_target, test_size=0.3, random_state=1, stratify=iris_target)
 

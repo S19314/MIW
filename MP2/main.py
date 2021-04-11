@@ -28,7 +28,6 @@ class Perceptron(object):
         return np.where(self.net_input(X) >= 0.0, 1, -1)
 
 class Classifier:
-
     def __init__(self, ppnArray):
         self.ppnArray = ppnArray
 
@@ -52,12 +51,50 @@ class DataSetManager(object):
         return
     '''
 
+class PerceptronManager(object):
+    data_train_01_subset = None
+    target_train_01_subset = None
+    def getData_train_01_subset(self):
+        return self.data_train_01_subset
 
-def createPerceptrons(quantity):
-    perceptrons = []
-    for i in range(quantity):
-        perceptrons.append(Perceptron(eta=0.2, n_iter=200))
-    return  perceptrons
+    def getTarget_train_01_subset(self):
+        return self.target_train_01_subset
+
+    def createPerceptrons(self, quantity):
+        perceptrons = []
+        for i in range(quantity):
+            perceptrons.append(Perceptron(eta=0.2, n_iter=200))
+        return  perceptrons.copy()
+
+    def teachPerceptrons(self, perceptrons, iris_data, iris_target):
+        data_train, data_test, target_train, target_test = train_test_split(iris_data, iris_target, test_size=0.3,
+                                                                            random_state=1, stratify=iris_target)
+        data_train_01_subset = data_train
+        target_train_01_subset = target_train
+        self.data_train_01_subset = data_train_01_subset
+        self.target_train_01_subset = target_train_01_subset
+        for perceptronId in range(len(perceptrons)):
+            perceptrons[perceptronId] = self.teachPerceptron(perceptrons[perceptronId], perceptronId, data_train_01_subset, target_train_01_subset, target_train)
+
+        return perceptrons.copy()
+
+    def teachPerceptron(self, perceptron,perceptronId, data_train_01_subset, target_train_01_subset, target_train):
+        target_train_01_subset[(target_train != perceptronId)] = -1
+        target_train_01_subset[(target_train == perceptronId)] = 1
+        print(target_train_01_subset)
+        perceptron.fit(data_train_01_subset, target_train_01_subset)
+        return  perceptron
+
+
+
+def showResultsTask1(perceptronManager, perceptron):
+    plot_decision_regions(X=perceptronManager.getData_train_01_subset(),
+                          y=perceptronManager.getTarget_train_01_subset(), classifier=perceptron)
+    plt.xlabel(r'$x_1$')
+    plt.ylabel(r'$x_2$')
+    plt.legend(loc='upper left')
+    plt.show()
+
 
 def main():
     print("initialization")
@@ -69,10 +106,25 @@ def main():
     print(iris_data)
     print()
     print(iris_target)
-    quantityOfPerceptrons = max(iris_target)
-    perceptrons = createPerceptrons(quantityOfPerceptrons)
+    quantityOfPerceptrons = max(iris_target) + 1
+    perceptronManager =  PerceptronManager()
 
+    perceptrons = perceptronManager.createPerceptrons(quantityOfPerceptrons)
+    perceptrons = perceptronManager.teachPerceptrons(perceptrons, iris_data, iris_target)
 
+    data_train, data_test, target_train, target_test = train_test_split(iris_data, iris_target, test_size=0.3,
+                                                                        random_state=1, stratify=iris_target)
+    data_train_01_subset = data_train
+    target_train_01_subset = target_train
+    target_train_01_subset[(target_train != 2)] = -1
+    target_train_01_subset[(target_train == 2)] = 1
+    print(target_train_01_subset)
+    ppn = Perceptron(eta=0.2, n_iter=200)
+    ppn.fit(data_train_01_subset, target_train_01_subset)
+    for perc in perceptrons:
+        showResultsTask1(perceptronManager, perc)
+
+    '''
     data_train, data_test, target_train, target_test = train_test_split(iris_data, iris_target, test_size=0.3, random_state=1, stratify=iris_target)
 
     data_train_01_subset = data_train
@@ -81,20 +133,23 @@ def main():
     target_train_01_subset[(target_train == 2)] = 1
     print(target_train_01_subset)
 
-
+   
     ppn.fit(data_train_01_subset, target_train_01_subset)
-
+    '''
     '''
     # X_train_01_subset = X_train[(y_train == 0) | (y_train == 1)]
     # y_train_01_subset = y_train[(y_train == 0) | (y_train == 1)]
     # w perceptronie wyjście jest albo 1 albo -1
     '''
-    plot_decision_regions(X=data_train_01_subset, y=target_train_01_subset, classifier=ppn)
+    '''
+    # plot_decision_regions(X=data_train_01_subset, y=target_train_01_subset, classifier=perceptrons[0])
+    plot_decision_regions(X=perceptronManager.getData_train_01_subset(), y=perceptronManager.getTarget_train_01_subset(), classifier=perceptrons[0])
     plt.xlabel(r'$x_1$')
     plt.ylabel(r'$x_2$')
     plt.legend(loc='upper left')
     plt.show()
 '''
+
 if __name__ == '__main__':
     main()
 '''
@@ -108,3 +163,4 @@ iris_target = iris.target
 print(iris_data)
 print()
 print(iris_target)
+'''

@@ -94,7 +94,7 @@ class PerceptronManager(object):
     def teachPerceptron(self, perceptron,perceptronId, data_train_01_subset, target_train_01_subset, target_train):
         perceptron.target_train_01_subset[(target_train != perceptronId)] = -1
         perceptron.target_train_01_subset[(target_train == perceptronId)] = 1
-        print(perceptron.target_train_01_subset)
+        # print(perceptron.target_train_01_subset)
         perceptron.fit(perceptron.getData_train_01_subset(), perceptron.getTarget_train_01_subset())
         return  perceptron
 
@@ -116,9 +116,11 @@ def punkt1():
     #    iris_data = iris.data[:, [2, 3]]
     iris_data = iris.data
     iris_target = iris.target
+    '''
     print(iris_data)
     print()
     print(iris_target)
+    '''
     quantityOfPerceptrons = max(iris_target) + 1
     perceptronManager = PerceptronManager()
 
@@ -179,6 +181,9 @@ class LogisticRegressionGD(object):
     def predict(self, X):
         return np.where(self.net_input(X) >= 0.0, 1, 0)
 
+    def getPropabilityOfBelongingToClass(self, X):
+        net_input = self.net_input(X)
+        return self.activation(net_input)
 
 class LogisticRegresionClassifier(object):
     logisticRegresionArray = []
@@ -202,8 +207,11 @@ class LogisticRegresionClassifier(object):
         quantityRegresions = len(self.logisticRegresionArray)
         for i in range(quantityRegresions):
           regresion = self.logisticRegresionArray[i]
-          if (regresion.predict(x) == 1):
+          prediction = regresion.predict(x)
+          if ( prediction == 1):
               return  i
+        return  -1
+
 
 
 class LogisticRegresionManager(object):
@@ -227,9 +235,9 @@ class LogisticRegresionManager(object):
         return regresions.copy()
 
     def teachRegresion(self, regresion, regresionId, data_train_01_subset, target_train_01_subset, target_train):
-        regresion.target_train_01_subset[(target_train != regresionId)] = -1
+        regresion.target_train_01_subset[(target_train != regresionId)] = 0 # -1
         regresion.target_train_01_subset[(target_train == regresionId)] = 1
-        print(regresion.target_train_01_subset)
+        # print(regresion.target_train_01_subset)
         regresion.fit(regresion.getData_train_01_subset(), regresion.getTarget_train_01_subset())
         return  regresion
 
@@ -242,32 +250,47 @@ def punkt2():
     #    iris_data = iris.data[:, [2, 3]]
     iris_data = iris.data
     iris_target = iris.target
+    ''' 
     print(iris_data)
     print()
     print(iris_target)
+    '''
     quantityOfRegresion = max(iris_target) + 1
     regresionManager = LogisticRegresionManager()
 
-    perceptrons = perceptronManager.createPerceptrons(quantityOfPerceptrons)
-    perceptrons = perceptronManager.teachPerceptrons(perceptrons, iris_data, iris_target)
+    regresions = regresionManager.createLogisticRegresions(quantityOfRegresion)
+    regresions = regresionManager.teachLogisticRegresions(regresions, iris_data, iris_target)
 
-    classificator = Classifier(perceptrons)
+    classificator = LogisticRegresionClassifier(regresions)
 
     correctAnswers = 0
     for i in range(len(iris_data)):
-        perceptronId = classificator.predict(iris_data[i])
-        if (iris_target[i] == perceptronId):
+        regresionId = classificator.predict(iris_data[i])
+        if (iris_target[i] == regresionId):
             correctAnswers = correctAnswers + 1
 
     print("Number of objects: " + str(len(iris_data)))
     print("Correct answers: " + str(correctAnswers))
     print("Accurancy " + str(correctAnswers / len(iris_data)))
+    print()
+    print()
+    # punkt 3
+    print("Punkt 3")
+    print("Propability Of Belonging To Class ")
+    print("For one element", end="")
+    print(regresions[0].getPropabilityOfBelongingToClass(iris_data[0]))
 
+    print("For list of elements", end="")
+    propabilities = []
+    for i in range(24):
+        propabilities.append(regresions[0].getPropabilityOfBelongingToClass(iris_data[i]))
+    print("Average: ", end="")
+    print(np.average(propabilities))
+    print("Median: ", end="")
+    print(np.median(propabilities))
 def main():
-    # punkt1()
+     punkt1()
      punkt2()
-
-
 
 
 if __name__ == '__main__':
